@@ -1,10 +1,12 @@
-import React, {useState, useRef} from "react";
+import React, {useState, useRef, useEffect} from "react";
 import {View, Text, StyleSheet, Button, Alert} from "react-native";
+import {Ionicons} from '@expo/vector-icons'
 
 import Card from "../components/Card";
 import NumberPad from "../components/NumberPad";
 
 import Colors from "../constants/Colors";
+import CustomButton from "../components/CustomButton";
 
 const generateRandomBetween = (min, max, given) => {
   min = Math.ceil(min);
@@ -26,9 +28,12 @@ const GameScreen = props => {
   const max = useRef(100);
   const [rounds, setRounds] = useState(0);
 
-  if (currentChoice == playersNumber) {
-    onGameOver(rounds);
-  }
+  useEffect(() => {
+    if (currentChoice === playersNumber) {
+      onGameOver(rounds);
+    }
+  }, [rounds]);
+
 
   const hintHandler = direction => {
     if ((direction === 'lower' && currentChoice < playersNumber) ||
@@ -57,14 +62,18 @@ const GameScreen = props => {
         <Text style={styles.guessText}>I guess the number is</Text>
         <NumberPad>{currentChoice}</NumberPad>
       </Card>
-      <View style={{width: '100%', alignItems: 'center'}}>
-        <Card style={styles.buttonContainer}>
-          <View style={{width: 90}}><Button title="Lower" color={Colors.lightBlue}
-                                            onPress={hintHandler.bind(this, 'lower')}/></View>
-          <View style={{width: 90}}><Button title="Greater" color={Colors.lightBlue}
-                                            onPress={hintHandler.bind(this, 'greater')}/></View>
-        </Card>
-      </View>
+      <Card style={styles.buttonContainer}>
+        <CustomButton
+          style={styles.buttonStyle}
+          onSelect={hintHandler.bind(this, 'lower')}>
+          <Ionicons name='ios-remove' size={35}/>
+        </CustomButton>
+        <CustomButton
+          style={styles.buttonStyle}
+          onSelect={hintHandler.bind(this, 'greater')}>
+          <Ionicons name='ios-add' size={35}/>
+        </CustomButton>
+      </Card>
     </View>);
 }
 
@@ -83,12 +92,18 @@ const styles = StyleSheet.create({
     width: 240,
     flexDirection: 'row',
     marginTop: 20,
-    justifyContent: 'space-around'
+    justifyContent: 'space-around',
+    alignItems: 'center',
   },
   guessText: {
     fontSize: 26,
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  buttonStyle: {
+    backgroundColor: Colors.lightBlue,
+    width: 70,
+    borderRadius: 35
   }
 });
 

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {StyleSheet, ScrollView, ImageBackground, Keyboard, Dimensions, TouchableWithoutFeedback} from 'react-native';
+import {View} from 'react-native';
 import * as Font from 'expo-font'
 import AppLoading from 'expo-app-loading';
 
@@ -56,22 +56,10 @@ export default function App() {
   }
 
   return (
-    <ScrollView>
-      <ImageBackground
-        source={require('./assets/images/StartScreenWallpaper.png')}
-        style={styles.screen}
-      >
-          <Head title="Guess the number"/>
-          {renderedScreen}
-      </ImageBackground>
-    </ScrollView>
+    <View style={{flex: 1}}>
+      <Head title="Guess the number"/>
+      {renderedScreen}
+    </View>
   );
 
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    height: Dimensions.get('screen').height,
-    width: Dimensions.get('screen').width,
-  },
-});

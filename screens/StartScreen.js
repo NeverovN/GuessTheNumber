@@ -6,12 +6,16 @@ import {
   TouchableWithoutFeedback,
   Button,
   Keyboard,
-  Alert
+  Alert,
+  Dimensions,
+  ImageBackground,
+  ScrollView
 } from "react-native";
 
 import Card from "../components/Card";
 import Input from "../components/Input";
 import NumberPad from "../components/NumberPad";
+import CustomButton from "../components/CustomButton";
 
 import Colors from "../constants/Colors";
 
@@ -21,6 +25,16 @@ const StartScreen = props => {
   const [enteredValue, setEnteredValue] = useState('');
   const [confirmed, setConfirmed] = useState(false);
   const [selectedNumber, setSelectedNumber] = useState();
+  const [width, setWidth] = useState(Dimensions.get('window').width);
+  const [height, setHeight] = useState(Dimensions.get('window').height);
+
+  const dimensionsChangeListener = () => {
+    setHeight(Dimensions.get('window').height);
+    setWidth(Dimensions.get('window').width);
+  }
+
+  Dimensions.addEventListener('change', dimensionsChangeListener);
+
 
   const numberInputHandler = inputText => {
     setEnteredValue(inputText.replace(/[^0-9]/g, ''));
@@ -56,66 +70,71 @@ const StartScreen = props => {
       <Card style={styles.selectedNumberContainer}>
         <Text style={{fontSize: 18}}> You selected </Text>
         <NumberPad>{selectedNumber}</NumberPad>
-        <Button
-          title='START GAME'
-          color={Colors.lightBlue}
-          onPress={() => props.onStartGame(selectedNumber)}
-        />
+        <CustomButton
+          style={{backgroundColor: Colors.lightBlue}}
+          onSelect={() => props.onStartGame(selectedNumber)}
+        >
+          START GAME
+        </CustomButton>
+
       </Card>
     )
   }
 
   return (
-    <TouchableWithoutFeedback onPress={() => {
-      Keyboard.dismiss();
-    }}>
-      <View style={{flex: 1}}>
-        <View style={styles.screen}>
+    <ImageBackground
+      source={require('../assets/images/StartScreenWallpaper.png')}
+      style={{flex: 1, height: height, width: width}}
+    >
+      <ScrollView style={{flex: 1, height: height > width ? height : height * 1.1, width: width,}}>
+        <TouchableWithoutFeedback onPress={() => {
+          Keyboard.dismiss();
+        }}>
+          <View style={styles.screen}>
+            <Text style={styles.text}>Start a New Game</Text>
+            <Card style={{...styles.inputView, width: width < height ? width * 0.8 : width * 0.7}}>
+              <Text>Select a number</Text>
+              <Input
+                style={styles.input}
+                color='black'
+                autoCapitalize='none'
+                keyboardType='number-pad'
+                maxLength={2}
+                value={enteredValue}
+                onChangeText={numberInputHandler}
+              />
+              <View style={styles.buttonsView}>
+                <View style={{...styles.button, width: width / 4}}>
+                  <Button
+                    title="RESET"
+                    color={Colors.reset}
+                    onPress={resetInputHandler}
+                  />
+                </View>
+                <View style={{width: width / 4}}>
+                  <Button
+                    title="SUBMIT"
+                    color={Colors.submit}
+                    style={{width: width / 4}}
+                    onPress={submitInputHandler}/>
+                </View>
+              </View>
+            </Card>
+            {confirmedRender}
+          </View>
+        </TouchableWithoutFeedback>
+      </ScrollView>
+    </ImageBackground>
 
-          <Text style={styles.text}>Start a New Game</Text>
-          <Card style={styles.inputView}>
-            <Text>Select a number</Text>
-            <Input
-              style={styles.input}
-              color='black'
-              blurOnSubmit
-              autoCapitalize='none'
-              keyboardType='number-pad'
-              maxLength={2}
-              value={enteredValue}
-              onChangeText={numberInputHandler}
-            />
-            <View style={styles.buttonsView}>
-              <View style={styles.button}>
-                <Button
-                  title="RESET"
-                  color={Colors.reset}
-                  onPress={resetInputHandler}
-                />
-              </View>
-              <View style={styles.button}>
-                <Button
-                  title="SUBMIT"
-                  color={Colors.submit}
-                  onPress={submitInputHandler}/>
-              </View>
-            </View>
-          </Card>
-          {confirmedRender}
-        </View>
-      </View>
-    </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
     padding: 10,
     alignItems: 'center',
   },
   inputView: {
-    width: 300,
     maxWidth: '80%',
     alignItems: 'center',
   },
@@ -132,11 +151,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%',
     justifyContent: 'space-around',
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     paddingTop: 10
-  },
-  button: {
-    width: 80,
   },
   input: {
     textAlign: 'center',
@@ -146,20 +162,9 @@ const styles = StyleSheet.create({
   selectedNumberContainer: {
     marginTop: 20,
     alignItems: 'center',
-    width: '60%'
-  },
-  image: {
-    height: 150,
-    width: 150,
-  },
-  imageContainer: {
-    height: 300,
-    width: 300,
-    overflow: 'hidden',
-    borderWidth: 5,
-    borderRadius: 150,
+    width: '60%',
+    marginBottom: 10
   }
-
 });
 
 export default StartScreen;
